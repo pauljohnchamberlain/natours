@@ -35,7 +35,7 @@ class APIFeatures {
   limitFields() {
     // 2) Field limiting
     if (this.queryString.fields) {
-      const fields = req.query.fields.split(',').join(' ');
+      const fields = this.queryString.fields.split(',').join(' ');
       this.query = this.query.select(fields); // select('name duration price')
     } else {
       this.query = this.query.select('-__v'); // default field

@@ -47,6 +47,7 @@ app.use('/api/v1/users', userRouter);
 // ERROR HANDLING MIDDLEWARE - 404 error handler for all other routes that are not defined above
 // Should be the last part after all the other routes
 app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
   // res.status(404).json({
   //   status: 'fail',
   //   message: `Can't find ${req.originalUrl}`,
@@ -56,7 +57,6 @@ app.all('*', (req, res, next) => {
   //   err.status = 'fail';
   // whenever we pass an argument into the next function express will assume it is an error, express will automatically know that there is an error
   // next(err); // passing the error to the next middleware
-  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 
 // ERROR HANDLING MIDDLEWARE - Global error handler
