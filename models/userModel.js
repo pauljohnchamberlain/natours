@@ -14,7 +14,6 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Please provide your email!'],
     unique: true,
     lowercase: true,
-    trim: true,
     validate: [validator.isEmail, 'Please provide a valid email!'],
   },
   photo: {
@@ -34,7 +33,7 @@ const userSchema = new mongoose.Schema({
   },
   passwordConfirm: {
     type: String,
-    required: [true, 'Please confirm your password!'],
+    required: [true, 'Please confirm your password'],
     validate: {
       // This only works on CREATE and SAVE!!!
       validator: function (el) {
@@ -46,6 +45,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 // .pre middleware functions are executed after getting the data and before saving the data to the database
@@ -59,6 +63,19 @@ userSchema.pre('save', async function (next) {
 
   // Delete the passwordConfirm field
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  // this points to the current query
+  this.find({ active: { $ne: false } });
   next();
 });
 
