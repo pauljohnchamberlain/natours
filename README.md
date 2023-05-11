@@ -61,7 +61,7 @@ The Natours project includes the following features:
 - Management of user roles and permissions.
 - Handling of forgetting and resetting user passwords.
 - Two special routes for updating the current user's data or password.
-- Sending real emails for new sign-ups and password resets using the SendinBlue API and the Mailtrap service.
+- Sending real emails for new sign-ups and password resets using the SendGrid API and the Mailtrap service.
 - Ability to get all reviews and create new reviews for a specific tour (nested routes).
 - Ability to make new bookings using Stripe checkout sessions for payment processing.
 - Usage of Stripe webhooks to handle asynchronous payment events, update booking statuses, and protect against fraud.

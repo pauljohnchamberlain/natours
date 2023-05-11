@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer');
-const Transport = require('nodemailer-sendinblue-transport');
 const pug = require('pug');
 const htmlToText = require('html-to-text');
 
@@ -33,9 +32,6 @@ module.exports = class Email {
         },
       });
     }
-    return nodemailer.createTransport(
-      new Transport({ apiKey: process.env.SENDINBLUE_API_KEY })
-    );
   }
 
   async send(template, subject) {
