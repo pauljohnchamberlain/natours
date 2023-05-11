@@ -1,65 +1,110 @@
-// REQUIRE MODULES
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
+const compression = require('compression');
+const cors = require('cors');
 
-// IMPORT ROUTES
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
+const viewRouter = require('./routes/viewRoutes');
 
 const app = express();
 
-// MIDDLEWARE
+app.enable('trust proxy'); // for heroku
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+// 1) GLOBAL MIDDLEWARES
+
+// Implement CORS
+app.use(cors());
+
+app.options('*', cors());
+
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Set security HTTP headers
+app.use(helmet({ contentSecurityPolicy: false }));
+
+// Development logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-app.use(express.json()); // middleware to parse the body of the request
+// Limit requests from same API
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!',
+});
+app.use('/api', limiter);
 
-// Serve static files
-app.use(express.static(`${__dirname}/public`));
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: '*/*' }),
+  bookingController.webhookCheckout
+);
 
-// app.use((req, res, next) => {
-//   // eslint-disable-next-line no-console
-//   console.log('Hello from the middleware');
-//   next();
-// });
+// Body parser, reading data from body into req.body
+app.use(express.json({ limit: '10kb' }));
 
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cookieParser());
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
+
+// Prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+);
+
+// Compress text sent to client
+app.use(compression());
+
+// Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  // console.log(req.headers); // to see the headers that the client sends to the server
+  // console.log(req.cookies);
   next();
 });
 
-// ROUTES - Mounting routers
+// 3) ROUTES
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
-// Old method to create routes
-// app.route('/api/v1/tours').get(getAllTours).post(createTour);
-// app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour);
-
-// app.route('/api/v1/users').get(getAllUsers).post(createUser);
-// app.route('/api/v1/users/:id').get(getUser).patch(updateUser).delete(deleteUser);
-//
-
-// ERROR HANDLING MIDDLEWARE - 404 error handler for all other routes that are not defined above
-// Should be the last part after all the other routes
 app.all('*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
-  // res.status(404).json({
-  //   status: 'fail',
-  //   message: `Can't find ${req.originalUrl}`,
-  // });
-  //   const err = new Error(`Can't find ${req.originalUrl} on this server`);
-  //   err.statusCode = 404;
-  //   err.status = 'fail';
-  // whenever we pass an argument into the next function express will assume it is an error, express will automatically know that there is an error
-  // next(err); // passing the error to the next middleware
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-// ERROR HANDLING MIDDLEWARE - Global error handler
 app.use(globalErrorHandler);
 
 module.exports = app;

@@ -5,52 +5,42 @@ class APIFeatures {
   }
 
   filter() {
-    // 1A) Filtering
     const queryObj = { ...this.queryString };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
-    // 1B) Advanced filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    let querystr = JSON.stringify(queryObj);
+    querystr = querystr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    this.query = this.query.find(JSON.parse(queryStr));
-
+    this.query = this.query.find(JSON.parse(querystr));
     return this;
   }
 
   sort() {
-    // 3) Sorting
     if (this.queryString.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      // console.log(sortBy);
-      this.query = this.query.sort(sortBy);
-      // sort('price ratingsAverage')
+      this.query = this.query.sort(this.queryString.sort.split(',').join(' '));
     } else {
-      this.query = this.query.sort('-createdAt'); // default sorting
+      this.query = this.query.sort('-createdAt');
     }
     return this;
   }
 
   limitFields() {
-    // 2) Field limiting
     if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').join(' ');
-      this.query = this.query.select(fields); // select('name duration price')
+      this.query = this.query.select(
+        this.queryString.fields.split(',').join(' ')
+      );
     } else {
-      this.query = this.query.select('-__v'); // default field
+      this.query = this.query.select('-__v');
     }
     return this;
   }
 
   paginate() {
-    // 4) Pagination
-    const page = this.queryString * 1 || 1; // multiply by 1 to convert to a number || default page (number 1 in this case)
-    const limit = this.queryString * 1 || 100; // default limit (100 in this case)
-    const skip = (page - 1) * limit; // page 1: 1-10, page 2: 11-20, page 3: 21-30, etc.
-
-    this.query = this.query.skip(skip).limit(limit); // 10 on a page and skip the first 10 results
-
+    const page = this.queryString.page * 1 || 1;
+    const limit = this.queryString.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+    this.query = this.query.skip(skip).limit(limit);
     return this;
   }
 }
