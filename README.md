@@ -70,7 +70,6 @@ The Natours project includes the following features:
 - `CSS`: a style sheet language used for describing the presentation of a document written in a markup language such as HTML
 - `Multer`: a Node.js middleware for handling multipart/form-data, which is primarily used for uploading files
 - `Sharp`: a Node.js image processing library for resizing and optimizing images
-- `cloudinary`: a cloud service that offers a solution to a web application's entire image management pipeline
 - `Prettier`: an opinionated code formatter that helps maintain consistent code style across the entire project
 - `ESLint`: a popular JavaScript linter for identifying and reporting on patterns found in JavaScript code
 - `parcel`: a web application bundler for JavaScript and CSS
