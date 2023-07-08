@@ -2,11 +2,11 @@
 
 export const displayMap = (locations) => {
   mapboxgl.accessToken =
-    'pk.eyJ1IjoiZGVnaGVkeSIsImEiOiJjbGd3eHlvcWgwZGxnM2pvMDhobHljbnh2In0.WGiLOvd9ZpWTckxotQkacA';
+    'pk.eyJ1IjoicGF1bGpvaG5jaGFtYmVybGFpbiIsImEiOiJjbGhlY3N1aWYxam94M2NvNzZuZW41ZXNsIn0.l91U8VqxX61gkriC_8VuGg';
 
   var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/deghedy/ckxaav0xt2u9515p8tihpyraw',
+    style: 'mapbox://styles/pauljohnchamberlain/clhfg9180002k01pvfi7n0sgp',
     scrollZoom: false,
   });
 
