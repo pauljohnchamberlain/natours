@@ -46,7 +46,7 @@
     "xss-clean": "^0.1.1"
   },
   "engines": {
-    "node": "18.x"
+    "node": "^18.16.1"
   },
   "devDependencies": {
     "buffer": "^5.7.1",
