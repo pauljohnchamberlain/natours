@@ -14,7 +14,8 @@
     "start:prod": "cross-env NODE_ENV=production nodemon server.js",
     "debug": "ndb server.js",
     "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/bundle --no-source-maps",
-    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundle --no-source-maps"
+    "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundle --no-source-maps",
+    "build": "parcel build ./public/js/index.js --dist-dir ./public/js/bundle --no-source-maps"
   },
   "author": "Paul John Chamberlain",
   "license": "ISC",
