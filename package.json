@@ -15,7 +15,8 @@
     "debug": "ndb server.js",
     "watch:js": "parcel watch ./public/js/index.js --dist-dir ./public/js/bundle --no-source-maps",
     "build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundle --no-source-maps",
-    "build": "parcel build ./public/js/index.js --dist-dir ./public/js/bundle --no-source-maps"
+    "build": "parcel build ./public/js/index.js --dist-dir ./public/js/bundle --no-source-maps",
+    "vercel-build": "echo hello"
   },
   "author": "Paul John Chamberlain",
   "license": "ISC",
